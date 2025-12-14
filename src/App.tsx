@@ -2,7 +2,7 @@ import './App.css'
 import { Routes, Route } from 'react-router-dom'
 import Dashboard from './pages/Dashboard'
 import { Login } from './pages/Login'
-import { ProtectedRoute } from './components/ProtectedRoute'
+import { ProtectedRoute } from './components/common/ProtectedRoute'
 
 
 function App() {
