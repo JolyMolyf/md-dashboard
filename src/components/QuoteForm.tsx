@@ -6,29 +6,29 @@ import { SelectTrigger } from "./ui/select";
 import { SelectValue } from "./ui/select";
 import type { Quote } from "@/api/quoteApi";
 const QuoteForm = ({ createQuote }: { createQuote: (quote: Partial<Quote>) => void }) => {
-    
+
     const { data: instruments } = useIntruments();
 
     const [selectedInstrument, setSelectedInstrument] = useState<string | undefined>(undefined);
-    
+
     const handleSelectInstrument = (instrument: string) => {
         setSelectedInstrument(instrument);
     }
 
     const handleCreateQuote = () => {
         if (selectedInstrument) {
-            createQuote({ instrumentId: selectedInstrument, optionType: 'Call'});
+            createQuote({ instrumentId: selectedInstrument, optionType: 'Call' });
         }
     }
 
     return (
-        <div className="w-[90%] mx-auto mb-10 mt-10 border-2 border-gray-300 rounded-xl px-2 py-5">
-            <p className="text-2xl font-bold mb-4">Quote Form</p>
+        <div className="w-[95%] mx-auto mb-10 mt-10 border-2 border-gray-300 rounded-xl px-5 py-5">
+            <p className="text-xl font-bold mb-5 pl-1">Create Quote</p>
             <div className="">
-                <div className="w-[150px] h-[30px]">   
+                <div className="w-55.5 h-7.5 mb-3.5">
                     <Select value={selectedInstrument} onValueChange={handleSelectInstrument}>
                         <SelectTrigger>
-                            <SelectValue placeholder="Select an instrument" /> 
+                            <SelectValue placeholder="Select an instrument" />
                         </SelectTrigger>
                         <SelectContent>
                             {instruments?.map((instrument) => (
@@ -40,9 +40,9 @@ const QuoteForm = ({ createQuote }: { createQuote: (quote: Partial<Quote>) => vo
                     </Select>
                 </div>
             </div>
-            <div className="w-full h-1 bg-grey-300 my-4"></div>
+            <div className="h-0.5 bg-gray-300 mt-5 mb-5 rounded-full" />
             <div className="">
-                <Button disabled={!selectedInstrument} onClick={handleCreateQuote}>Create Quote</Button>
+                <Button className="w-37.5 h-6.25" size="sm" disabled={!selectedInstrument} onClick={handleCreateQuote}>Create Quote</Button>
             </div>
         </div>
     )

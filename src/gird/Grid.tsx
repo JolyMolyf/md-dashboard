@@ -24,12 +24,12 @@ const Grid = ({ quotesData, marketUpdates }: { quotesData: Quote[], marketUpdate
     useEffect(() => {
         if (gridRef.current && marketUpdates.length > 0) {
             const gridApi = gridRef.current.api;
-            
+
             const rowsToUpdate: any[] = [];
-            
+
             marketUpdates.forEach((update) => {
                 const matchingQuotes = quotesData.filter(q => q.instrumentId === update.instrumentId);
-                
+
                 matchingQuotes.forEach(quote => {
                     rowsToUpdate.push({
                         ...quote,
@@ -53,12 +53,12 @@ const Grid = ({ quotesData, marketUpdates }: { quotesData: Quote[], marketUpdate
 
     return (
         <div className="w-full h-full">
-            <div className="w-[90vw] h-1/2 mx-auto ml-10">
-                <AgGridReact 
+            <div className="h-2/3 mx-auto w-[95%]">
+                <AgGridReact
                     ref={gridRef}
-                    className="ag-theme-alpine w-full h-full" 
+                    className="ag-theme-alpine w-full h-full"
                     rowData={quotesData}
-                    columnDefs={columnDefs} 
+                    columnDefs={columnDefs}
                     getRowId={getRowId}
                 />
             </div>
