@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from 'react'
-import { socket } from '../socket/socket'
+import { useContext, useEffect, useState } from 'react'
 import Grid from '../gird/Grid'
 import QuoteForm from '../components/QuoteForm'
 import { useQuotes } from '../hooks/useQuotes'
@@ -10,8 +9,12 @@ import { Switch } from '@/components/ui/switch'
 import { Card } from '@/components/ui/card'
 import { CardContent } from '@/components/ui/card'
 import useMdSimulator from '@/hooks/useMdSimulatorHook'
+import { WorkerContext } from '@/hooks/context/WorkerContext'
+import { WorkerInputMessages, WorkerOutputMessages } from '@/worker/message_types'
 
 export default function Dashboard() {
+
+    const worker = useContext(WorkerContext);
     const { data: quotesData, createQuote } = useQuotes();
     const { startSimulator, stopSimulator, statusSimulator } = useMdSimulator();
     const [marketUpdates, setMarketUpdates] = useState<any[]>([])
@@ -21,14 +24,36 @@ export default function Dashboard() {
     const isMutating = startSimulator.isPending || stopSimulator.isPending;
 
     useEffect(() => {
-        socket.on('market-updates', (updates) => {
-            setMarketUpdates(updates)
-        })
+        if (!worker) return;
 
-        return () => {
-            socket.off('market-updates');
+        if (isRunning) {
+            worker.postMessage({ type: WorkerInputMessages.START_SIMULATOR });
+        } else {
+            worker.postMessage({ type: WorkerInputMessages.STOP_SIMULATOR });
+        }
+    }, [worker, isRunning]);
+
+    useEffect(() => {
+        if (worker && quotesData) {
+            worker.postMessage({ 
+                type: WorkerInputMessages.UPDATE_QUOTES, 
+                payload: quotesData 
+            });
+        }
+    }, [worker, quotesData]);
+    
+    useEffect(() => {
+        if (!worker) return;
+        
+        const handleMessage = (event: MessageEvent) => {
+            if (event.data.type === WorkerOutputMessages.MARKET_DATA_UPDATE) {
+                 setMarketUpdates(event.data.payload); 
+            }
         };
-    }, []);
+        worker.addEventListener('message', handleMessage);
+        return () => worker.removeEventListener('message', handleMessage);
+    }, [worker]);
+
 
     const handleSwitchChange = (checked: boolean) => {
         if (checked) {

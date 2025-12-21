@@ -25,27 +25,11 @@ const Grid = ({ quotesData, marketUpdates }: { quotesData: Quote[], marketUpdate
         if (gridRef.current && marketUpdates.length > 0) {
             const gridApi = gridRef.current.api;
 
-            const rowsToUpdate: any[] = [];
+        
 
-            marketUpdates.forEach((update) => {
-                const matchingQuotes = quotesData.filter(q => q.instrumentId === update.instrumentId);
-
-                matchingQuotes.forEach(quote => {
-                    rowsToUpdate.push({
-                        ...quote,
-                        symbol: update.symbol,
-                        spotPrice: update.spotPrice,
-                        mktBid: update.mktBid,
-                        mktAsk: update.mktAsk,
-                        delta: update.delta,
-                        premium: update.premium,
-                    });
-                });
-            });
-
-            if (rowsToUpdate.length > 0) {
+            if (marketUpdates.length > 0) {
                 gridApi.applyTransactionAsync({
-                    update: rowsToUpdate
+                    update: marketUpdates
                 });
             }
         }

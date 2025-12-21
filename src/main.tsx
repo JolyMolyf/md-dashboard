@@ -6,6 +6,7 @@ import { BrowserRouter } from 'react-router-dom';
 import './index.css'
 import App from './App.tsx'
 import { AuthProvider } from './hooks/context/AuthProvider';
+import { WorkerProvider } from './hooks/context/WorkerProvider';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -16,7 +17,9 @@ createRoot(document.getElementById('root')!).render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <AuthProvider>
-          <App />
+          <WorkerProvider>
+            <App />
+          </WorkerProvider>
         </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>
