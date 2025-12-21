@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useContext, useEffect, useState } from 'react'
 import Grid from '../gird/Grid'
 import QuoteForm from '../components/QuoteForm'
 import { useQuotes } from '../hooks/useQuotes'
@@ -9,51 +7,18 @@ import { Switch } from '@/components/ui/switch'
 import { Card } from '@/components/ui/card'
 import { CardContent } from '@/components/ui/card'
 import useMdSimulator from '@/hooks/useMdSimulatorHook'
-import { WorkerContext } from '@/hooks/context/WorkerContext'
-import { WorkerInputMessages, WorkerOutputMessages } from '@/worker/message_types'
+import { useWorkerSync } from '@/hooks/useWorkerSync'
 
 export default function Dashboard() {
 
-    const worker = useContext(WorkerContext);
     const { data: quotesData, createQuote } = useQuotes();
     const { startSimulator, stopSimulator, statusSimulator } = useMdSimulator();
-    const [marketUpdates, setMarketUpdates] = useState<any[]>([])
     const { name, email, id } = useAuth();
 
     const isRunning = statusSimulator.data ?? false;
     const isMutating = startSimulator.isPending || stopSimulator.isPending;
 
-    useEffect(() => {
-        if (!worker) return;
-
-        if (isRunning) {
-            worker.postMessage({ type: WorkerInputMessages.START_SIMULATOR });
-        } else {
-            worker.postMessage({ type: WorkerInputMessages.STOP_SIMULATOR });
-        }
-    }, [worker, isRunning]);
-
-    useEffect(() => {
-        if (worker && quotesData) {
-            worker.postMessage({ 
-                type: WorkerInputMessages.UPDATE_QUOTES, 
-                payload: quotesData 
-            });
-        }
-    }, [worker, quotesData]);
-    
-    useEffect(() => {
-        if (!worker) return;
-        
-        const handleMessage = (event: MessageEvent) => {
-            if (event.data.type === WorkerOutputMessages.MARKET_DATA_UPDATE) {
-                 setMarketUpdates(event.data.payload); 
-            }
-        };
-        worker.addEventListener('message', handleMessage);
-        return () => worker.removeEventListener('message', handleMessage);
-    }, [worker]);
-
+    const { marketUpdates } = useWorkerSync({ isRunning, quotesData });
 
     const handleSwitchChange = (checked: boolean) => {
         if (checked) {
